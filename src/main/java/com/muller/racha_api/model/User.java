@@ -46,7 +46,7 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PixKey> pixKeys = new ArrayList<>();
 
-    @Column(nullable = false, length = 20)
+    @Column(nullable = false)
     private String password;
 
     @CreatedDate
@@ -57,22 +57,22 @@ public class User implements UserDetails {
     @Column(nullable = false, updatable = true)
     private LocalDateTime updatedAt;
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAuthorities'");
-    }
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean oAuth2User = false;
 
     @Override
-    public String getPassword() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getPassword'");
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return new ArrayList<>();
     }
 
     @Override
     public String getUsername() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getUsername'");
+        return this.email;
+    }
+
+    @Override
+    public String getPassword() {
+        return this.password;
     }
 
     @Override
