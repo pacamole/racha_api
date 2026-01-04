@@ -13,6 +13,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -44,6 +45,9 @@ public class SecurityConfiguration {
         @Autowired
         OAuth2SuccessHandler successHandler;
 
+        @Autowired
+        SecurityFilter securityFilter;
+
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
                 // CROSS-SITE REQUEST FORGERY
@@ -66,6 +70,8 @@ public class SecurityConfiguration {
                                 }).oauth2Client(Customizer.withDefaults())
                                 .oauth2Login(oauth -> oauth
                                                 .successHandler(successHandler));
+
+                http.addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class);
 
                 return http.build();
         }

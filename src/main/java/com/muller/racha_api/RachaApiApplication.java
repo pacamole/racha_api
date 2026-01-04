@@ -11,12 +11,13 @@ import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.security.OAuthFlow;
 import io.swagger.v3.oas.annotations.security.OAuthFlows;
 import io.swagger.v3.oas.annotations.security.OAuthScope;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.annotations.security.SecuritySchemes;
 
 @SpringBootApplication
 @EnableJpaAuditing
-@OpenAPIDefinition(info = @Info(title = "Racha API", version = "1.0", description = "API para administrar o pagamento de um valor em grupo"))
+@OpenAPIDefinition(info = @Info(title = "Racha API", version = "1.0", description = "API para administrar o pagamento de um valor em grupo"), security = @SecurityRequirement(name = "bearerAuth"))
 @SecuritySchemes({
 		@SecurityScheme(name = "bearerAuth", type = SecuritySchemeType.HTTP, scheme = "bearer", bearerFormat = "JWT", in = SecuritySchemeIn.HEADER),
 		@SecurityScheme(name = "google", type = SecuritySchemeType.OAUTH2, flows = @OAuthFlows(authorizationCode = @OAuthFlow(authorizationUrl = "https://accounts.google.com/o/oauth2/v2/auth", tokenUrl = "https://oauth2.googleapis.com/token", scopes = {

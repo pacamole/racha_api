@@ -36,8 +36,10 @@ public class AuthenticationService implements UserDetailsService {
 
     public User loginOrRegisterOAuth2User(OAuth2User oAuth2User) {
         String email = oAuth2User.getAttribute("email");
+        User user = userRepository.findByEmail(email).orElseThrow(() -> {
+            throw new IllegalArgumentException("Email de usuário não encontrado");
+        });
         String name = oAuth2User.getAttribute("name");
-        User user = userRepository.findByEmail(email);
 
         if (user == null) {
             user = new User();
@@ -53,11 +55,9 @@ public class AuthenticationService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(username);
-
-        if (user == null) {
-            throw new UsernameNotFoundException("Usuário não encontrado");
-        }
+        User user = userRepository.findByEmail(username).orElseThrow(() -> {
+            throw new IllegalArgumentException("Email de usuário não encontrado");
+        });
 
         if (user.isOAuth2User()) {
             throw new UsernameNotFoundException("Este usuário pode logar apenas com a conta google");
