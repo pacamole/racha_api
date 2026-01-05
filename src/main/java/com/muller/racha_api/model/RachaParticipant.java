@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -33,10 +35,12 @@ public class RachaParticipant {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @JsonIgnore
     private User user;
 
     @ManyToOne
     @JoinColumn(name = "racha_id", nullable = false)
+    @JsonIgnore
     private RachaItem racha;
 
     @Column(nullable = false)
@@ -53,6 +57,7 @@ public class RachaParticipant {
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 
+    @Column(nullable = true)
     private LocalDateTime paidAt;
 
     public boolean isFullyPaid() {

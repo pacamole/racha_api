@@ -1,5 +1,7 @@
 package com.muller.racha_api.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -27,6 +29,7 @@ public class Comment {
 
     @ManyToOne
     @JoinColumn(name = "author", nullable = false)
+    @JsonIgnore
     private RachaParticipant author;
 
 }

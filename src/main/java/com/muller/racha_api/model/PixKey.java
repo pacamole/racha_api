@@ -2,6 +2,8 @@ package com.muller.racha_api.model;
 
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -13,10 +15,12 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Entity
 @AllArgsConstructor
+@NoArgsConstructor
 public class PixKey {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -24,9 +28,10 @@ public class PixKey {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnore
     private User user;
 
-    @Column(nullable = false, length = 256)
+    @Column(name = "key_value", nullable = false, length = 256)
     private String key;
 
     @Column(nullable = false)

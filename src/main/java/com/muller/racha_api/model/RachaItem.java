@@ -10,6 +10,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.muller.racha_api.dto.RachaItemRequestDTO;
 
 import jakarta.persistence.CascadeType;
@@ -40,6 +41,7 @@ public class RachaItem {
 
     @ManyToOne
     @JoinColumn(name = "representative_id", nullable = false)
+    @JsonIgnore
     private User representative;
 
     @Column(nullable = false, length = 30)
