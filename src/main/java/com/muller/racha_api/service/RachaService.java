@@ -52,6 +52,9 @@ public class RachaService {
             participant.setUser(user);
             participant.setRacha(racha);
 
+            participant.setValuePaid(BigDecimal.ZERO);
+            participant.setPaidAt(null);
+
             participants.add(participant);
 
             racha.setParticipants(new ArrayList<RachaParticipant>(participants));
