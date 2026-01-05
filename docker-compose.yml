@@ -1,5 +1,6 @@
 services:
-  db: 
+  # Banco de Dados
+  db:
     image: postgres:16-alpine
     container_name: racha_db
     restart: unless-stopped
@@ -17,6 +18,7 @@ services:
       timeout: 5s
       retries: 5
   
+  # --- AMBIENTE DEV (Postgres via Docker) ---
   app_dev:
     build: .
     container_name: racha_api_dev
@@ -25,31 +27,38 @@ services:
       db:
         condition: service_healthy
     ports:
-      - "8080:8080"
-    environment: 
+      - "8080:8080" # Mantido 8080 como você pediu
+    environment:
       - SPRING_PROFILES_ACTIVE=dev
+      # Força o uso do Postgres ignorando o application-dev.properties
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/racha_db
+      - SPRING_DATASOURCE_USERNAME=${DB_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver
+      - SPRING_JPA_DATABASE_PLATFORM=org.hibernate.dialect.PostgreSQLDialect
+      # Variáveis da Aplicação
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - GOOGLE_CLIENT_ID_SECRET=${GOOGLE_CLIENT_ID_SECRET}
       - JWT_SECRET=${JWT_SECRET}
-      - DB_USERNAME=${DB_USERNAME}
-      - DB_PASSWORD=${DB_PASSWORD}
 
-  app:
+  # --- AMBIENTE PROD (Postgres via Docker) ---
+  app_prod:
     build: .
-    container_name: racha_api
+    container_name: racha_api_prod
     restart: unless-stopped
     depends_on:
       db:
         condition: service_healthy
     ports:
       - "8080:8080"
-    environment: 
+    environment:
       - SPRING_PROFILES_ACTIVE=prod
+      # Em PROD ele lê direto do application-prod.properties, só passamos as credenciais
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - GOOGLE_CLIENT_ID_SECRET=${GOOGLE_CLIENT_ID_SECRET}
       - JWT_SECRET=${JWT_SECRET}
-      - DB_USERNAME=${DB_USERNAME}
-      - DB_PASSWORD=${DB_PASSWORD}
 
 volumes:
   postgres_data:
