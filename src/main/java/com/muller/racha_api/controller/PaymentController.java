@@ -28,26 +28,26 @@ public class PaymentController {
     private final PaymentService paymentService;
 
     @PostMapping("/{rachaId}")
-    public Payment sendPayment(@AuthenticationPrincipal User user, @PathVariable String rachaId,
+    public Payment create(@AuthenticationPrincipal User user, @PathVariable String rachaId,
             @RequestBody @Valid PaymentRequestDTO dto) {
-        return paymentService.sendPayment(user.getId(), UUID.fromString(rachaId), dto);
+        return paymentService.create(user.getId(), UUID.fromString(rachaId), dto);
     }
 
     @GetMapping("/{rachaId}")
-    public Page<Payment> listPaymentsByRacha(@AuthenticationPrincipal User user, @PathVariable String rachaId) {
-        return paymentService.listPaymentsByRacha(user.getId(), UUID.fromString(rachaId), null);
+    public Page<Payment> findAllByRacha(@AuthenticationPrincipal User user, @PathVariable String rachaId) {
+        return paymentService.findAllByRacha(user.getId(), UUID.fromString(rachaId), null);
     }
 
     @PutMapping("/{rachaId}/{paymentId}")
-    public Payment updatePaymentStatus(@AuthenticationPrincipal User user, @PathVariable String rachaId,
+    public Payment update(@AuthenticationPrincipal User user, @PathVariable String rachaId,
             @PathVariable String paymentId, @RequestBody @Valid PaymentRequestDTO dto) {
-        return paymentService.editPayment(user.getId(), UUID.fromString(rachaId), UUID.fromString(paymentId), dto);
+        return paymentService.update(user.getId(), UUID.fromString(rachaId), UUID.fromString(paymentId), dto);
     }
 
     @DeleteMapping("/{rachaId}/{paymentId}")
-    public void deletePayment(@AuthenticationPrincipal User user, @PathVariable String rachaId,
+    public void delete(@AuthenticationPrincipal User user, @PathVariable String rachaId,
             @PathVariable String paymentId) {
-        paymentService.deletePayment(user.getId(), UUID.fromString(rachaId), UUID.fromString(paymentId));
+        paymentService.delete(user.getId(), UUID.fromString(rachaId), UUID.fromString(paymentId));
     }
 
 }

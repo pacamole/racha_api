@@ -28,7 +28,7 @@ public class PaymentService {
     private final RachaParticipantRepository participantRepository;
 
     @Transactional
-    public Payment sendPayment(UUID userId, UUID rachaId, PaymentRequestDTO dto) {
+    public Payment create(UUID userId, UUID rachaId, PaymentRequestDTO dto) {
         RachaParticipant participant = participantRepository.findByUserIdAndRachaId(userId, rachaId).orElseThrow(() -> {
             throw new IllegalArgumentException("Não é um participante desta racha ou racha não existe");
         });
@@ -49,7 +49,7 @@ public class PaymentService {
         return paymentSaved;
     }
 
-    public Page<Payment> listPaymentsByRacha(UUID userId, UUID rachaId, Pageable pageable) {
+    public Page<Payment> findAllByRacha(UUID userId, UUID rachaId, Pageable pageable) {
         RachaItem racha = rachaRepository.findById(rachaId).orElseThrow(() -> {
             throw new IllegalArgumentException("Racha não encontrada");
         });
@@ -62,7 +62,7 @@ public class PaymentService {
     }
 
     @Transactional
-    public Payment editPayment(UUID userId, UUID rachaId, UUID paymentId, PaymentRequestDTO dto) {
+    public Payment update(UUID userId, UUID rachaId, UUID paymentId, PaymentRequestDTO dto) {
 
         // Validações
         Payment payment = paymentRepository.findById(paymentId).orElseThrow(() -> {
@@ -124,7 +124,7 @@ public class PaymentService {
     }
 
     @Transactional
-    public void deletePayment(UUID userId, UUID rachaId, UUID paymentId) {
+    public void delete(UUID userId, UUID rachaId, UUID paymentId) {
         // Validações
         Payment payment = paymentRepository.findById(paymentId).orElseThrow(() -> {
             throw new IllegalArgumentException("Pagamento indicado não existe");
