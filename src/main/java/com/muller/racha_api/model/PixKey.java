@@ -3,6 +3,7 @@ package com.muller.racha_api.model;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.muller.racha_api.dto.PixKeyRequestDTO;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -37,4 +38,12 @@ public class PixKey {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private PixType type;
+
+    public static PixKey toEntity(PixKeyRequestDTO dto, User user) {
+        PixKey pixKey = new PixKey();
+        pixKey.setUser(user);
+        pixKey.setKey(dto.getKey());
+        pixKey.setType(dto.getType());
+        return pixKey;
+    }
 }
