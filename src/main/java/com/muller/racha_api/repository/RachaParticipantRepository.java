@@ -13,4 +13,6 @@ public interface RachaParticipantRepository extends JpaRepository<RachaParticipa
 
     public Optional<RachaParticipant> findByUserIdAndRachaId(UUID userId, UUID rachaId);
 
+    public boolean existsByUserIdAndRachaId(UUID userId, UUID rachaId);
+
 }

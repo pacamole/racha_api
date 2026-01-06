@@ -49,11 +49,9 @@ public class RachaParticipant {
     @Column(nullable = false)
     private BigDecimal valueToPay;
 
-    // Pagamentos ligados ao Participante
     @OneToMany(mappedBy = "participant", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Payment> payments = new ArrayList<>();
 
-    // Comentários ligados ao Participante (Sua correção final!)
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 

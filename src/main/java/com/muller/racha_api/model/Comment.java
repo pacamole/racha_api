@@ -1,6 +1,7 @@
 package com.muller.racha_api.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.muller.racha_api.dto.CommentRequestDTO;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -28,8 +29,15 @@ public class Comment {
     private String content;
 
     @ManyToOne
-    @JoinColumn(name = "author", nullable = false)
+    @JoinColumn(name = "racha_participant_id", nullable = false)
     @JsonIgnore
     private RachaParticipant author;
+
+    public static Comment toEntity(CommentRequestDTO dto) {
+        Comment comment = new Comment();
+        comment.setContent(dto.getContent());
+
+        return comment;
+    }
 
 }
