@@ -24,7 +24,7 @@ public class RachaItemRequestDTO {
     @Nonnull
     private BigDecimal totalPrice;
     @Schema(description = "Data de vencimento do item de racha", example = "2024-12-31T23:59:59")
-    private LocalDateTime dueDate;
+    private LocalDateTime PaymentDate;
     @NotNull(message = "É necessário informar se o representante irá participar do racha")
     private boolean representative_participate;
 }

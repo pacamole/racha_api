@@ -26,7 +26,7 @@ public class RachaService {
     private final UserRepository userRepository;
     private final RachaItemRepository rachaRepository;
 
-    private BigDecimal calculateValueToPay(BigDecimal totalPrice, Integer qttParticipants) {
+    protected static BigDecimal calculateValueToPay(BigDecimal totalPrice, Integer qttParticipants) {
         BigDecimal valueToPay = totalPrice.divide(
                 BigDecimal.valueOf(qttParticipants),
                 2, // Escala (casas decimais)
@@ -43,7 +43,7 @@ public class RachaService {
 
         RachaItem racha = RachaItem.toEntity(dto);
         racha.setRepresentative(user);
-        racha.setDueDate(dto.getDueDate());
+        racha.setPaymentDate(dto.getPaymentDate());
 
         List<RachaParticipant> participants = new ArrayList<RachaParticipant>();
 
@@ -95,8 +95,8 @@ public class RachaService {
         if (!dto.getTotalPrice().equals(rachaItem.getTotalPrice())) {
             rachaItem.setTotalPrice(dto.getTotalPrice());
         }
-        if (!dto.getDueDate().equals(rachaItem.getDueDate())) {
-            rachaItem.setDueDate(dto.getDueDate());
+        if (!dto.getPaymentDate().equals(rachaItem.getPaymentDate())) {
+            rachaItem.setPaymentDate(dto.getPaymentDate());
         }
 
         return rachaRepository.save(rachaItem);

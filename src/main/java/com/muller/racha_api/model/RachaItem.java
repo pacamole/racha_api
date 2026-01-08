@@ -23,6 +23,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -54,10 +55,13 @@ public class RachaItem {
 
     private BigDecimal currentlyPaid = BigDecimal.ZERO;
 
-    private LocalDateTime dueDate;
+    private LocalDateTime paymentDate;
 
     @OneToMany(mappedBy = "racha", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RachaParticipant> participants = new ArrayList<RachaParticipant>();
+
+    @OneToOne(mappedBy = "racha", cascade = CascadeType.ALL)
+    private RachaInvite invitation;
 
     @CreatedDate
     @Column(nullable = false, updatable = false)
@@ -74,7 +78,7 @@ public class RachaItem {
         racha.setTitle(dto.getTitle());
         racha.setDescription(dto.getDescription());
         racha.setTotalPrice(dto.getTotalPrice());
-        racha.setDueDate(dto.getDueDate());
+        racha.setPaymentDate(dto.getPaymentDate());
         return racha;
     }
 
@@ -83,7 +87,7 @@ public class RachaItem {
         dto.setTitle(racha.getTitle());
         dto.setDescription(racha.getDescription());
         dto.setTotalPrice(racha.getTotalPrice());
-        dto.setDueDate(racha.getDueDate());
+        dto.setPaymentDate(racha.getPaymentDate());
         return dto;
     }
 

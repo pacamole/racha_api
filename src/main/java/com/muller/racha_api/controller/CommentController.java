@@ -21,23 +21,23 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/comment")
+@RequestMapping("/racha")
 @RequiredArgsConstructor
 public class CommentController {
     private final CommentService commentService;
 
-    @PostMapping("/{rachaId}")
+    @PostMapping("/{rachaId}/comment")
     public Comment create(@AuthenticationPrincipal User user, @PathVariable String rachaId,
             @RequestBody @Valid CommentRequestDTO dto) {
         return commentService.create(user.getId(), UUID.fromString(rachaId), dto);
     }
 
-    @GetMapping("/{rachaId}")
+    @GetMapping("/{rachaId}/comment")
     public List<Comment> findByRacha(@AuthenticationPrincipal User user, @PathVariable String rachaId) {
         return commentService.findAllByRachaId(user.getId(), UUID.fromString(rachaId));
     }
 
-    @DeleteMapping("/{commentId}")
+    @DeleteMapping("/comment/{commentId}")
     public void delete(@AuthenticationPrincipal User user, @PathVariable String commentId) {
         commentService.delete(user.getId(), Long.decode(commentId));
     }

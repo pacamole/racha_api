@@ -22,29 +22,29 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/payment")
+@RequestMapping("/racha")
 @RequiredArgsConstructor
 public class PaymentController {
     private final PaymentService paymentService;
 
-    @PostMapping("/{rachaId}")
+    @PostMapping("/{rachaId}/payment")
     public Payment create(@AuthenticationPrincipal User user, @PathVariable String rachaId,
             @RequestBody @Valid PaymentRequestDTO dto) {
         return paymentService.create(user.getId(), UUID.fromString(rachaId), dto);
     }
 
-    @GetMapping("/{rachaId}")
+    @GetMapping("/{rachaId}/payment")
     public Page<Payment> findAllByRacha(@AuthenticationPrincipal User user, @PathVariable String rachaId) {
         return paymentService.findAllByRacha(user.getId(), UUID.fromString(rachaId), null);
     }
 
-    @PutMapping("/{rachaId}/{paymentId}")
+    @PutMapping("/{rachaId}/payment/{paymentId}")
     public Payment update(@AuthenticationPrincipal User user, @PathVariable String rachaId,
             @PathVariable String paymentId, @RequestBody @Valid PaymentRequestDTO dto) {
         return paymentService.update(user.getId(), UUID.fromString(rachaId), UUID.fromString(paymentId), dto);
     }
 
-    @DeleteMapping("/{rachaId}/{paymentId}")
+    @DeleteMapping("/{rachaId}/payment/{paymentId}")
     public void delete(@AuthenticationPrincipal User user, @PathVariable String rachaId,
             @PathVariable String paymentId) {
         paymentService.delete(user.getId(), UUID.fromString(rachaId), UUID.fromString(paymentId));
