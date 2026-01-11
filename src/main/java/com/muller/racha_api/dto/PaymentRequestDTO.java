@@ -16,9 +16,6 @@ public class PaymentRequestDTO {
     @NotNull
     private BigDecimal paymentValue;
 
-    @Schema(description = "URL da imagem do comprovante de pagamento", example = "http://example.com/comprovante.jpg")
-    private String imageUrl;
-
     @Schema(description = "Mensagem do pagamento", example = "Paguei toda minha parte")
     private String message;
 

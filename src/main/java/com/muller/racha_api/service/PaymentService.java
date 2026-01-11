@@ -28,12 +28,12 @@ public class PaymentService {
     private final RachaParticipantRepository participantRepository;
 
     @Transactional
-    public Payment create(UUID userId, UUID rachaId, PaymentRequestDTO dto) {
+    public Payment create(UUID userId, UUID rachaId, PaymentRequestDTO dto, String imageUrl) {
         RachaParticipant participant = participantRepository.findByUserIdAndRachaId(userId, rachaId).orElseThrow(() -> {
             throw new IllegalArgumentException("Não é um participante desta racha ou racha não existe");
         });
 
-        Payment payment = Payment.toEntity(dto, participant);
+        Payment payment = Payment.toEntity(dto, participant, imageUrl);
         Payment paymentSaved = paymentRepository.save(payment);
 
         BigDecimal participantTotalPaid = participant.getValuePaid().add(payment.getPaymentValue());
@@ -62,7 +62,7 @@ public class PaymentService {
     }
 
     @Transactional
-    public Payment update(UUID userId, UUID rachaId, UUID paymentId, PaymentRequestDTO dto) {
+    public Payment update(UUID userId, UUID rachaId, UUID paymentId, PaymentRequestDTO dto, String imageUrl) {
 
         // Validações
         Payment payment = paymentRepository.findById(paymentId).orElseThrow(() -> {
@@ -81,8 +81,8 @@ public class PaymentService {
         }
 
         // Atualizações simples
-        if (!dto.getImageUrl().isBlank()) {
-            payment.setImageUrl(dto.getImageUrl());
+        if (!imageUrl.isBlank()) {
+            payment.setImageUrl(imageUrl);
         }
         if (!dto.getMessage().isBlank()) {
             payment.setMessage(dto.getMessage());

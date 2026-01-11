@@ -49,10 +49,10 @@ public class Payment {
     @Column(nullable = false)
     private LocalDateTime paidAt;
 
-    public static Payment toEntity(PaymentRequestDTO dto, RachaParticipant participant) {
+    public static Payment toEntity(PaymentRequestDTO dto, RachaParticipant participant, String imageUrl) {
         Payment payment = new Payment();
         payment.setPaymentValue(dto.getPaymentValue());
-        payment.setImageUrl(dto.getImageUrl());
+        payment.setImageUrl(imageUrl);
         payment.setMessage(dto.getMessage());
         payment.setParticipant(participant);
         return payment;

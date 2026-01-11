@@ -3,20 +3,26 @@ package com.muller.racha_api.controller;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.muller.racha_api.dto.PaymentRequestDTO;
 import com.muller.racha_api.model.Payment;
 import com.muller.racha_api.model.User;
 import com.muller.racha_api.service.PaymentService;
+import com.muller.racha_api.service.R2StorageService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,11 +32,20 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PaymentController {
     private final PaymentService paymentService;
+    private final R2StorageService storageService;
+    private final ObjectMapper objectMapper;
 
-    @PostMapping("/{rachaId}/payment")
-    public Payment create(@AuthenticationPrincipal User user, @PathVariable String rachaId,
-            @RequestBody @Valid PaymentRequestDTO dto) {
-        return paymentService.create(user.getId(), UUID.fromString(rachaId), dto);
+    @PostMapping(value = "/{rachaId}/payment", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public Payment create(
+            @AuthenticationPrincipal User user,
+            @PathVariable String rachaId,
+            @RequestPart("file") MultipartFile file,
+            @RequestPart("data") String dataJson) throws Exception {
+
+        PaymentRequestDTO dto = objectMapper.readValue(dataJson, PaymentRequestDTO.class);
+
+        String imageUrl = storageService.upload(file);
+        return paymentService.create(user.getId(), UUID.fromString(rachaId), dto, imageUrl);
     }
 
     @GetMapping("/{rachaId}/payment")
@@ -39,9 +54,15 @@ public class PaymentController {
     }
 
     @PutMapping("/{rachaId}/payment/{paymentId}")
-    public Payment update(@AuthenticationPrincipal User user, @PathVariable String rachaId,
-            @PathVariable String paymentId, @RequestBody @Valid PaymentRequestDTO dto) {
-        return paymentService.update(user.getId(), UUID.fromString(rachaId), UUID.fromString(paymentId), dto);
+    public Payment update(
+            @AuthenticationPrincipal User user,
+            @PathVariable String rachaId,
+            @PathVariable String paymentId,
+            @RequestParam("file") MultipartFile file,
+            @ModelAttribute @Valid PaymentRequestDTO dto) {
+
+        String imageUrl = storageService.upload(file);
+        return paymentService.update(user.getId(), UUID.fromString(rachaId), UUID.fromString(paymentId), dto, imageUrl);
     }
 
     @DeleteMapping("/{rachaId}/payment/{paymentId}")
