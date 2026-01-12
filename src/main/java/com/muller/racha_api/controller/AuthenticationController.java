@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.muller.racha_api.controller.docs.AuthenticationControllerDocs;
 import com.muller.racha_api.dto.AuthenticationDTO;
 import com.muller.racha_api.dto.RegisterDTO;
 import com.muller.racha_api.model.User;
@@ -22,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
-public class AuthenticationController {
+public class AuthenticationController implements AuthenticationControllerDocs {
     private final AuthenticationManager authenticationManager;
     private final TokenService tokenService;
     private final AuthenticationService authService;

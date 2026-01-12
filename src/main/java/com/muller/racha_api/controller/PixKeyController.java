@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.muller.racha_api.controller.docs.PixKeyControllerDocs;
 import com.muller.racha_api.dto.PixKeyRequestDTO;
 import com.muller.racha_api.model.PixKey;
 import com.muller.racha_api.model.User;
@@ -24,7 +25,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/user/me/pixkey")
 @RequiredArgsConstructor
-public class PixKeyController {
+public class PixKeyController implements PixKeyControllerDocs {
     private final PixKeyService pixKeyService;
 
     @PostMapping

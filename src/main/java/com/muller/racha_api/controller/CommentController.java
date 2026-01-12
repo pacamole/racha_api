@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.muller.racha_api.controller.docs.CommentControllerDocs;
 import com.muller.racha_api.dto.CommentRequestDTO;
 import com.muller.racha_api.model.Comment;
 import com.muller.racha_api.model.User;
@@ -23,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/racha")
 @RequiredArgsConstructor
-public class CommentController {
+public class CommentController implements CommentControllerDocs {
     private final CommentService commentService;
 
     @PostMapping("/{rachaId}/comment")

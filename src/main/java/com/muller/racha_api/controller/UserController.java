@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.muller.racha_api.controller.docs.UserControllerDocs;
 import com.muller.racha_api.dto.UpdateUserDTO;
 import com.muller.racha_api.model.User;
 import com.muller.racha_api.service.UserService;
@@ -24,7 +25,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/user")
 @RequiredArgsConstructor
-public class UserController {
+public class UserController implements UserControllerDocs {
     private final UserService userService;
 
     @GetMapping

@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.muller.racha_api.controller.docs.RachaControllerDocs;
 import com.muller.racha_api.dto.RachaItemRequestDTO;
 import com.muller.racha_api.model.RachaItem;
 import com.muller.racha_api.model.User;
@@ -29,7 +30,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/racha")
 @RequiredArgsConstructor
-public class RachaController {
+public class RachaController implements RachaControllerDocs {
     private final RachaService rachaService;
 
     @PostMapping
