@@ -22,7 +22,6 @@ import com.muller.racha_api.dto.PaymentRequestDTO;
 import com.muller.racha_api.model.Payment;
 import com.muller.racha_api.model.User;
 import com.muller.racha_api.service.PaymentService;
-import com.muller.racha_api.service.R2StorageService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -31,7 +30,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PaymentController implements PaymentControllerDocs {
     private final PaymentService paymentService;
-    private final R2StorageService storageService;
     private final ObjectMapper objectMapper;
 
     @PostMapping(value = "/{rachaId}/payment", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -43,13 +41,7 @@ public class PaymentController implements PaymentControllerDocs {
 
         PaymentRequestDTO dto = objectMapper.readValue(dataJson, PaymentRequestDTO.class);
 
-        String imageUrl = null;
-
-        if (file != null && !file.isEmpty()) {
-            imageUrl = storageService.upload(file);
-        }
-
-        return paymentService.create(user.getId(), UUID.fromString(rachaId), dto, imageUrl);
+        return paymentService.create(user.getId(), UUID.fromString(rachaId), dto, file);
     }
 
     @GetMapping("/{rachaId}/payment")
@@ -67,12 +59,7 @@ public class PaymentController implements PaymentControllerDocs {
 
         PaymentRequestDTO dto = objectMapper.readValue(dataJson, PaymentRequestDTO.class);
 
-        String imageUrl = null;
-
-        if (file != null && !file.isEmpty()) {
-            imageUrl = storageService.upload(file);
-        }
-        return paymentService.update(user.getId(), UUID.fromString(rachaId), UUID.fromString(paymentId), dto, imageUrl);
+        return paymentService.update(user.getId(), UUID.fromString(rachaId), UUID.fromString(paymentId), dto, file);
     }
 
     @DeleteMapping("/{rachaId}/payment/{paymentId}")

@@ -42,7 +42,7 @@ public class Payment {
 
     @Column(nullable = false)
     private BigDecimal paymentValue;
-    private String imageUrl;
+    private String fileUrl;
     private String message;
 
     @CreatedDate
@@ -52,7 +52,7 @@ public class Payment {
     public static Payment toEntity(PaymentRequestDTO dto, RachaParticipant participant, String imageUrl) {
         Payment payment = new Payment();
         payment.setPaymentValue(dto.getPaymentValue());
-        payment.setImageUrl(imageUrl);
+        payment.setFileUrl(imageUrl);
         payment.setMessage(dto.getMessage());
         payment.setParticipant(participant);
         return payment;

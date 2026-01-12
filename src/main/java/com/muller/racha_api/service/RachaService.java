@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.muller.racha_api.dto.RachaItemRequestDTO;
+import com.muller.racha_api.model.Payment;
 import com.muller.racha_api.model.RachaItem;
 import com.muller.racha_api.model.RachaParticipant;
 import com.muller.racha_api.model.User;
@@ -25,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 public class RachaService {
     private final UserRepository userRepository;
     private final RachaItemRepository rachaRepository;
+    private final R2StorageService storageService;
 
     protected static BigDecimal calculateValueToPay(BigDecimal totalPrice, Integer qttParticipants) {
         BigDecimal valueToPay = totalPrice.divide(
@@ -107,13 +109,22 @@ public class RachaService {
             throw new IllegalArgumentException("Usuário não encontrado");
         }
 
-        RachaItem rachaItem = rachaRepository.findById(rachaId).orElseThrow(() -> {
+        RachaItem racha = rachaRepository.findById(rachaId).orElseThrow(() -> {
             throw new IllegalArgumentException("Racha não encontrada");
         });
 
-        if (!rachaItem.getRepresentative().getId().equals(userId)) {
+        if (!racha.getRepresentative().getId().equals(userId)) {
             throw new IllegalArgumentException("Usuário não é o representante da racha");
         }
+
+        for (RachaParticipant part : racha.getParticipants()) {
+            if (part.getPayments() != null)
+                for (Payment payment : part.getPayments()) {
+                    storageService.delete(payment.getFileUrl());
+                }
+        }
+
+        rachaRepository.findById(rachaId);
 
         rachaRepository.deleteById(rachaId);
     }

@@ -41,7 +41,16 @@ public class R2StorageService {
     }
 
     public void delete(String fileUrl) {
+        if (fileUrl == null || fileUrl.isBlank())
+            return;
 
+        try {
+            String fileName = fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
+
+            s3Template.deleteObject(bucketName, fileName);
+        } catch (Exception e) {
+            throw new RuntimeException("Falha ao deletar a imagem" + e.getMessage(), e);
+        }
     }
 
 }

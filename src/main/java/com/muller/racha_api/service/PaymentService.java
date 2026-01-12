@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.muller.racha_api.dto.PaymentRequestDTO;
 import com.muller.racha_api.model.Payment;
@@ -26,27 +27,43 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final RachaItemRepository rachaRepository;
     private final RachaParticipantRepository participantRepository;
+    private final R2StorageService storageService;
 
     @Transactional
-    public Payment create(UUID userId, UUID rachaId, PaymentRequestDTO dto, String imageUrl) {
+    public Payment create(UUID userId, UUID rachaId, PaymentRequestDTO dto, MultipartFile file) {
         RachaParticipant participant = participantRepository.findByUserIdAndRachaId(userId, rachaId).orElseThrow(() -> {
             throw new IllegalArgumentException("Não é um participante desta racha ou racha não existe");
         });
 
-        Payment payment = Payment.toEntity(dto, participant, imageUrl);
-        Payment paymentSaved = paymentRepository.save(payment);
+        String imageUrl = null;
+        if (file != null && !file.isEmpty()) {
+            imageUrl = storageService.upload(file);
+        }
 
-        BigDecimal participantTotalPaid = participant.getValuePaid().add(payment.getPaymentValue());
-        participant.setValuePaid(participantTotalPaid);
-        participant.setPaidAt(LocalDateTime.now());
-        participantRepository.save(participant);
+        try {
+            Payment payment = Payment.toEntity(dto, participant, imageUrl);
+            Payment paymentSaved = paymentRepository.save(payment);
 
-        RachaItem racha = participant.getRacha();
-        BigDecimal rachaCurrentlyPaid = racha.getCurrentlyPaid().add(payment.getPaymentValue());
-        racha.setCurrentlyPaid(rachaCurrentlyPaid);
-        rachaRepository.save(racha);
+            BigDecimal participantTotalPaid = participant.getValuePaid().add(payment.getPaymentValue());
+            participant.setValuePaid(participantTotalPaid);
+            participant.setPaidAt(LocalDateTime.now());
+            participantRepository.save(participant);
 
-        return paymentSaved;
+            RachaItem racha = participant.getRacha();
+            BigDecimal rachaCurrentlyPaid = racha.getCurrentlyPaid().add(payment.getPaymentValue());
+            racha.setCurrentlyPaid(rachaCurrentlyPaid);
+            rachaRepository.save(racha);
+
+            return paymentSaved;
+        } catch (Exception e) {
+            if (imageUrl != null) {
+                storageService.delete(imageUrl);
+            }
+
+            // Relança o erro para o Controller saber que falhou e o @Transactional
+            // funcionar
+            throw e;
+        }
     }
 
     public Page<Payment> findAllByRacha(UUID userId, UUID rachaId, Pageable pageable) {
@@ -62,7 +79,7 @@ public class PaymentService {
     }
 
     @Transactional
-    public Payment update(UUID userId, UUID rachaId, UUID paymentId, PaymentRequestDTO dto, String imageUrl) {
+    public Payment update(UUID userId, UUID rachaId, UUID paymentId, PaymentRequestDTO dto, MultipartFile file) {
 
         // Validações
         Payment payment = paymentRepository.findById(paymentId).orElseThrow(() -> {
@@ -81,8 +98,13 @@ public class PaymentService {
         }
 
         // Atualizações simples
-        if (!imageUrl.isBlank()) {
-            payment.setImageUrl(imageUrl);
+        if (file == null || !file.isEmpty()) {
+            String imageUrl = null;
+            if (file != null && !file.isEmpty()) {
+                imageUrl = storageService.upload(file);
+            }
+
+            payment.setFileUrl(imageUrl);
         }
         if (!dto.getMessage().isBlank()) {
             payment.setMessage(dto.getMessage());
@@ -138,6 +160,9 @@ public class PaymentService {
         if (!participantUser.getId().equals(userId)) {
             throw new IllegalArgumentException("Não é o usuario dono do pagamento");
         }
+
+        storageService.delete(payment.getFileUrl());
+
         // Valor pago do participante
         BigDecimal paymentValue = payment.getPaymentValue();
         BigDecimal participantTotalPaid = participant.getValuePaid().subtract(paymentValue);
