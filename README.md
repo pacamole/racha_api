@@ -2,13 +2,30 @@
 
 ![Java](https://img.shields.io/badge/Java-21-orange) ![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.0-green) ![Docker](https://img.shields.io/badge/Docker-Enabled-blue) ![AWS](https://img.shields.io/badge/AWS-EC2-yellow)
 
+## 🛠️ Tecnologias Utilizadas
+
+* **Linguagem:** Java 21
+* **Framework:** Spring Boot 3
+* **Banco de Dados:** PostgreSQL
+* **Infraestrutura:** Docker & Docker Compose
+* **Cloud:** AWS EC2 (Hospedagem) & Cloudflare R2 (Storage)
+* **Servidor Web:** Nginx (Proxy Reverso)
+* **Documentação:** Swagger (OpenAPI)
+
 ## Sobre o Projeto
 
 O **Racha API** é um sistema backend projetado para gerenciar e simplificar a divisão de despesas financeiras entre grupos ("Rachas"). A aplicação resolve a fricção comum de cobrar amigos, validar pagamentos e centralizar comprovantes em um único lugar.
 
 A lógica do sistema gira em torno da entidade **Racha**, onde um representante define o valor total e o sistema gerencia o ciclo de vida da dívida, desde o convite dos participantes até a quitação total.
 
-### Funcionalidades e Regras de Negócio
+### Funcionalidades Principais
+
+* 🔐 **Autenticação:** Login via Google e JWT.
+* ☁️ **Upload de Arquivos:** Armazenamento de comprovantes utilizando Cloudflare R2.
+* 💰 **Pagamentos:** Gerenciamento de chaves PIX.
+* 🐳 **Containerização:** Ambientes de Desenvolvimento e Produção isolados via Docker.
+
+### Regras de Negócio
 
 - **Divisão Automática e Justa:**
   * Ao criar um Racha, o sistema calcula automaticamente a cota de cada participante (`Total / Participantes`).
@@ -33,27 +50,9 @@ A lógica do sistema gira em torno da entidade **Racha**, onde um representante 
 - **Segurança e Autenticação:**
   * Suporte híbrido para Login Tradicional (Email/Senha) e **Login Social (Google OAuth2)**.
   * Proteção de rotas via **Tokens JWT**, garantindo que apenas os participantes do grupo tenham acesso aos dados sensíveis.
- 
-### Funcionalidades Principais
 
-* 🔐 **Autenticação:** Login via Google e JWT.
-* ☁️ **Upload de Arquivos:** Armazenamento de comprovantes utilizando Cloudflare R2.
-* 💰 **Pagamentos:** Gerenciamento de chaves PIX.
-* 🐳 **Containerização:** Ambientes de Desenvolvimento e Produção isolados via Docker.
-
----
-
-## 🛠️ Tecnologias Utilizadas
-
-* **Linguagem:** Java 21
-* **Framework:** Spring Boot 3
-* **Banco de Dados:** PostgreSQL
-* **Infraestrutura:** Docker & Docker Compose
-* **Cloud:** AWS EC2 (Hospedagem) & Cloudflare R2 (Storage)
-* **Servidor Web:** Nginx (Proxy Reverso)
-* **Documentação:** Swagger (OpenAPI)
-
----
+### Relação de Entidade
+<img width="1787" height="1457" alt="Racha - DER" src="https://github.com/user-attachments/assets/75d6d33a-6fc4-4aca-bebb-b49b4f7261a4" />
 
 ## 🚀 Como Rodar Localmente
 
@@ -102,3 +101,8 @@ O projeto está hospedado em uma instância *AWS EC2*, utilizando uma arquitetur
 - **Nginx** atua como Proxy Reverso na porta 80, gerenciando o tráfego.
 - **Docker** orquestra os containers, permitindo alternar entre versões de Dev e Prod.
 - Para economizar CPU no servidor, as imagens Docker são construídas localmente e enviadas prontas para a AWS, evitando compilação em ambiente de produção.
+
+***Vizualização da arquitetura***
+<img width="5052" height="3213" alt="Racha server - Diagrama ASCII" src="https://github.com/user-attachments/assets/f6dda81b-c1dc-4e5d-8fa2-60d6fca79974" />
+
+
