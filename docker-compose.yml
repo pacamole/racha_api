@@ -1,64 +1,137 @@
+version: '3.8'
+
 services:
-  # Banco de Dados
-  db:
-    image: postgres:16-alpine
-    container_name: racha_db
-    restart: unless-stopped
-    environment:
-      - POSTGRES_USER=${DB_USERNAME}
-      - POSTGRES_PASSWORD=${DB_PASSWORD}
-      - POSTGRES_DB=racha_db
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
+  # ===========================================================================
+  # NGINX (O Porteiro / Proxy Reverso)
+  # Ele recebe a conexão na porta 80 e decide pra quem mandar
+  # ===========================================================================
+  nginx:
+    image: nginx:alpine
+    container_name: nginx_proxy
+    restart: always
     ports:
-      - "5432:5432"
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    # O Nginx não depende diretamente dos apps para subir, 
+    # ele apenas redireciona o tráfego quando eles estiverem prontos.
+
+  # ===========================================================================
+  # AMBIENTE DE DESENVOLVIMENTO (DEV)
+  # ===========================================================================
+  
+  # Banco de Dados DEV
+  db_dev:
+    image: postgres:16-alpine
+    container_name: racha_db_dev
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: racha_db_dev
+    volumes:
+      - postgres_data_dev:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d racha_db_dev"]
       interval: 10s
       timeout: 5s
       retries: 5
-  
-  # --- AMBIENTE DEV (Postgres via Docker) ---
+
+  # API DEV
   app_dev:
-    build: .
+    image: racha-api:dev
     container_name: racha_api_dev
-    restart: unless-stopped
-    depends_on:
-      db:
-        condition: service_healthy
-    ports:
-      - "8080:8080" # Mantido 8080 como você pediu
+    restart: always
+    pull_policy: never  # Usa a imagem local (carregada via docker load)
+    # Porta removida: Acessível apenas via Nginx
+    env_file: .env
     environment:
       - SPRING_PROFILES_ACTIVE=dev
-      # Força o uso do Postgres ignorando o application-dev.properties
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/racha_db
-      - SPRING_DATASOURCE_USERNAME=${DB_USERNAME}
-      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+      
+      # --- CORREÇÕES DE DRIVER (Devido ao application-dev.properties estar como H2) ---
       - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver
       - SPRING_JPA_DATABASE_PLATFORM=org.hibernate.dialect.PostgreSQLDialect
-      # Variáveis da Aplicação
+      
+      # --- CONEXÃO COM BANCO DEV ---
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db_dev:5432/racha_db_dev
+      - SPRING_DATASOURCE_USERNAME=${DB_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+      
+      # --- VARIÁVEIS GERAIS ---
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - GOOGLE_CLIENT_ID_SECRET=${GOOGLE_CLIENT_ID_SECRET}
       - JWT_SECRET=${JWT_SECRET}
-
-  # --- AMBIENTE PROD (Postgres via Docker) ---
-  app_prod:
-    build: .
-    container_name: racha_api_prod
-    restart: unless-stopped
+      - R2_ENDPOINT=${R2_ENDPOINT}
+      - R2_ACCESS_KEY=${R2_ACCESS_KEY}
+      - R2_SECRET_KEY=${R2_SECRET_KEY}
+      - R2_BUCKET_NAME=${R2_BUCKET_NAME}
+      - R2_BUCKET_URL=${R2_BUCKET_URL}
+      
+      # Update: Cria/Atualiza tabelas automaticamente
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
     depends_on:
-      db:
+      db_dev:
         condition: service_healthy
-    ports:
-      - "8080:8080"
+
+  # ===========================================================================
+  # AMBIENTE DE PRODUÇÃO (PROD)
+  # ===========================================================================
+
+  # Banco de Dados PROD
+  db_prod:
+    image: postgres:16-alpine
+    container_name: racha_db_prod
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: racha_db_prod
+    volumes:
+      - postgres_data_prod:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d racha_db_prod"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # API PROD
+  app_prod:
+    image: racha-api:prod
+    container_name: racha_api_prod
+    restart: always
+    pull_policy: never
+    # Porta removida: Acessível apenas via Nginx
+    env_file: .env
     environment:
       - SPRING_PROFILES_ACTIVE=prod
-      # Em PROD ele lê direto do application-prod.properties, só passamos as credenciais
+      
+      # --- CONEXÃO COM BANCO PROD ---
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db_prod:5432/racha_db_prod
       - DB_USERNAME=${DB_USERNAME}
       - DB_PASSWORD=${DB_PASSWORD}
+      
+      # --- INTEGRAÇÕES EXTERNAS ---
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - GOOGLE_CLIENT_ID_SECRET=${GOOGLE_CLIENT_ID_SECRET}
       - JWT_SECRET=${JWT_SECRET}
+      
+      # --- STORAGE (Cloudflare R2) ---
+      - R2_ENDPOINT=${R2_ENDPOINT}
+      - R2_ACCESS_KEY=${R2_ACCESS_KEY}
+      - R2_SECRET_KEY=${R2_SECRET_KEY}
+      - R2_BUCKET_NAME=${R2_BUCKET_NAME}
+      - R2_BUCKET_URL=${R2_BUCKET_URL}
+      
+      # Para produção, usar validate
+      # (Mude para 'update' no primeiro deploy se o banco estiver vazio)
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+    depends_on:
+      db_prod:
+        condition: service_healthy
 
+# ===========================================================================
+# VOLUMES PERSISTENTES
+# ===========================================================================
 volumes:
-  postgres_data:
+  postgres_data_dev:
+  postgres_data_prod:
